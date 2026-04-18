@@ -2,62 +2,26 @@ import { FC, memo } from 'react';
 import { BurgerConstructorElementUI } from '@ui';
 import { BurgerConstructorElementProps } from './type';
 import {
-  selectConstructorItems,
-  setConstructorItem
+  moveIngredientDown,
+  moveIngredientUp,
+  removeIngredient
 } from '../../slices/rootSlice';
-import { useDispatch, useSelector } from '../../services/store';
-import { TIngredient } from '@utils-types';
-import { v4 as uuidv4 } from 'uuid';
+import { useDispatch } from '../../services/store';
 
 export const BurgerConstructorElement: FC<BurgerConstructorElementProps> = memo(
   ({ ingredient, index, totalItems }) => {
     const dispatch = useDispatch();
-    const data = useSelector(selectConstructorItems);
-    const ingredients = data.ingredients;
-
-    const makeNewItem = (type: string) => {
-      const updatedIngredient = Object.assign({}, ingredient);
-      updatedIngredient._id = uuidv4();
-      const arr: TIngredient[] = Array.from(ingredients);
-      arr.splice(index, 1);
-
-      switch (type) {
-        case 'down':
-          arr.splice(index + 1, 0, updatedIngredient);
-          return arr;
-        case 'up':
-          arr.splice(index - 1, 0, updatedIngredient);
-          return arr;
-        default:
-          return arr;
-      }
-    };
 
     const handleMoveDown = () => {
-      dispatch(
-        setConstructorItem({
-          type: 'reloadIngridients',
-          data: { ...data, ingredients: makeNewItem('down') }
-        })
-      );
+      dispatch(moveIngredientDown(index));
     };
 
     const handleMoveUp = () => {
-      dispatch(
-        setConstructorItem({
-          type: 'reloadIngridients',
-          data: { ...data, ingredients: makeNewItem('up') }
-        })
-      );
+      dispatch(moveIngredientUp(index));
     };
 
     const handleClose = () => {
-      dispatch(
-        setConstructorItem({
-          type: 'reloadIngridients',
-          data: { ...data, ingredients: makeNewItem('delete') }
-        })
-      );
+      dispatch(removeIngredient(ingredient.id));
     };
 
     return (

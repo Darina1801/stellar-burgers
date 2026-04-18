@@ -29,12 +29,10 @@ export const BurgerIngredients: FC = () => {
   useEffect(() => {
     if (inViewBuns) {
       setCurrentTab('bun');
-    }
-    if (inViewSauces) {
-      setCurrentTab('sauce');
-    }
-    if (inViewFilling) {
+    } else if (inViewFilling) {
       setCurrentTab('main');
+    } else if (inViewSauces) {
+      setCurrentTab('sauce');
     }
   }, [inViewBuns, inViewFilling, inViewSauces]);
 

@@ -49,7 +49,7 @@ const App = () => {
   const updatedTitleOrder = extractStringAfterFeed(location.pathname, 'order');
 
   return (
-    <Routes>
+    <Routes location={background || location}>
       <Route path='/' element={<MainLayout />}>
         <Route index element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
