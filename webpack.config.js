@@ -93,14 +93,6 @@ module.exports = {
     ],
     compress: true,
     historyApiFallback: true,
-    port: 4000,
-    proxy: [
-      {
-        context: ['/api'],
-        target: 'https://norma.nomoreparties.space',
-        changeOrigin: true,
-        secure: false
-      }
-    ]
+    port: 4000
   }
 };
