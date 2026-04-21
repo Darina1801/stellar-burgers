@@ -1,26 +1,33 @@
 import { FC, SyntheticEvent, useState } from 'react';
 import { RegisterUI } from '@ui-pages';
 import { registerUserApi } from '@api';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from '../../services/store';
+import { setUser } from '@slices/rootSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { setCookie } from '../../utils/cookie';
 
 export const Register: FC = () => {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorText, setErrorText] = useState('');
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const passwordRegex = /^.{6,}$/;
+  const location = useLocation();
+
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-    if (!passwordRegex.test(password)) {
-      return;
-    }
+    if (password.length < 6) return;
     setErrorText('');
     try {
       const data = await registerUserApi({ email, password, name: userName });
-      navigate('/login');
-    } catch (e: any) {
-      setErrorText(e.message);
+      setCookie('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      dispatch(setUser(data.user));
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    } catch (e) {
+      setErrorText((e as Error).message);
     }
   };
 

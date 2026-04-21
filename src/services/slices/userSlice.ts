@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getUserApi, logoutApi, updateUserApi } from '@api';
 import { TUser } from '@utils-types';
 
@@ -9,7 +9,7 @@ type UserState = {
 
 const initialState: UserState = {
   user: null,
-  isAuthChecked: true
+  isAuthChecked: false
 };
 
 export const loadUser = createAsyncThunk(
@@ -31,17 +31,16 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser(state, action) {
+    setUser(state, action: PayloadAction<TUser | null>) {
       state.user = action.payload;
     }
   },
   extraReducers: (builder) => {
     builder
       .addCase(logout.pending, (state) => {
-        state.isAuthChecked = false;
+        state.user = null;
       })
       .addCase(logout.fulfilled, (state) => {
-        state.user = null;
         state.isAuthChecked = true;
       })
       .addCase(logout.rejected, (state) => {
@@ -62,9 +61,7 @@ export const userSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
       })
-      .addCase(updateUser.rejected, (state, action) => {
-        console.log('error', action);
-      });
+      .addCase(updateUser.rejected, (_state) => {});
   }
 });
 

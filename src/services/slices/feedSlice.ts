@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   getFeedsApi,
   getOrderByNumberApi,
@@ -10,23 +10,15 @@ import { TOrder } from '@utils-types';
 type FeedState = {
   feedData: TFeedsResponse;
   orders: TOrder[];
-  selectedOrder: TOrder;
-};
-
-const emptyOrder: TOrder = {
-  createdAt: '',
-  ingredients: [],
-  _id: '',
-  status: '',
-  name: '',
-  updatedAt: '',
-  number: 0
+  isOrdersLoading: boolean;
+  selectedOrder: TOrder | null;
 };
 
 const initialState: FeedState = {
   feedData: { success: true, orders: [], total: 0, totalToday: 0 },
   orders: [],
-  selectedOrder: emptyOrder
+  isOrdersLoading: false,
+  selectedOrder: null
 };
 
 export const loadFeedData = createAsyncThunk<TFeedsResponse>(
@@ -48,14 +40,17 @@ export const feedSlice = createSlice({
   name: 'feed',
   initialState,
   reducers: {
-    setSelectedOrder(state, action) {
+    setSelectedOrder(state, action: PayloadAction<string>) {
       if (action.payload === 'close') {
-        state.selectedOrder = initialState.selectedOrder;
+        state.selectedOrder = null;
       }
     }
   },
   extraReducers: (builder) => {
     builder
+      .addCase(loadFeedData.pending, (state) => {
+        state.feedData = initialState.feedData;
+      })
       .addCase(loadFeedData.fulfilled, (state, action) => {
         state.feedData = action.payload;
       })
@@ -64,20 +59,26 @@ export const feedSlice = createSlice({
       });
     builder
       .addCase(loadOrders.pending, (state) => {
+        state.isOrdersLoading = true;
         state.orders = [];
       })
       .addCase(loadOrders.fulfilled, (state, action) => {
+        state.isOrdersLoading = false;
         state.orders = action.payload;
       })
       .addCase(loadOrders.rejected, (state) => {
+        state.isOrdersLoading = false;
         state.orders = [];
       });
     builder
+      .addCase(loadOrder.pending, (state) => {
+        state.selectedOrder = null;
+      })
       .addCase(loadOrder.fulfilled, (state, action) => {
         state.selectedOrder = action.payload.orders[0];
       })
       .addCase(loadOrder.rejected, (state) => {
-        state.selectedOrder = initialState.selectedOrder;
+        state.selectedOrder = null;
       });
   }
 });

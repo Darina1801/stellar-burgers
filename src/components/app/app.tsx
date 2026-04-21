@@ -1,3 +1,4 @@
+import { FC, useEffect } from 'react';
 import {
   ConstructorPage,
   Feed,
@@ -9,168 +10,115 @@ import {
   Register,
   ResetPassword
 } from '@pages';
-import '../../index.css';
+import styles from './app.module.css';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { MainLayout } from '../../layouts';
 import { ProtectedRoute } from '../protected-route';
-import { IngredientDetails, Modal, OrderInfo } from '@components';
+import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
+import { Preloader } from '@ui';
 import { useDispatch, useSelector } from '../../services/store';
 import {
-  selectOrder,
-  setSelectedOrder,
-  setSelectItem
-} from '../../slices/rootSlice';
+  loadIngredients,
+  selectIngredientsError,
+  selectIsIngredientsLoading
+} from '@slices/rootSlice';
 import { useLocation } from 'react-router';
-import { ItemPageUI } from '../ui/pages/item';
+import clsx from 'clsx';
 
-const App = () => {
+const App: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const orderData = useSelector(selectOrder);
-  const background = location.state;
+  const background = location.state?.background;
 
-  function extractStringAfterFeed(str: string, category: string) {
-    let regex = /\/feed\/(\d+)/;
-    if (category === 'feed') {
-      regex = /\/feed\/(\d+)/;
-    } else if (category === 'order') {
-      regex = /\/profile\/orders\/(.*)/;
-    }
-    const match = str.match(regex);
-    if (match) {
-      return match[1]; // Возвращаем найденное значение после '/feed/'
-    } else {
-      return null; // Возвращаем null, если совпадений не найдено
-    }
-  }
+  const isIngredientsLoading = useSelector(selectIsIngredientsLoading);
+  const error = useSelector(selectIngredientsError);
 
-  const updatedTitleFeed = extractStringAfterFeed(location.pathname, 'feed');
-  const updatedTitleOrder = extractStringAfterFeed(location.pathname, 'order');
+  useEffect(() => {
+    dispatch(loadIngredients());
+  }, []);
+
+  const handleModalClose = () => navigate(-1);
 
   return (
-    <Routes location={background || location}>
-      <Route path='/' element={<MainLayout />}>
-        <Route index element={<ConstructorPage />} />
-        <Route path='/feed' element={<Feed />} />
-        <Route
-          path='/feed/:number'
-          element={
-            background ? (
-              <Modal
-                title={orderData?.number === 0 ? '' : `#${orderData?.number}`}
-                onClose={() => {
-                  dispatch(setSelectedOrder('close'));
-                  navigate('/feed');
-                }}
-              >
-                <OrderInfo />
-              </Modal>
-            ) : (
-              <ItemPageUI
-                title={updatedTitleFeed !== null ? `#${updatedTitleFeed}` : ''}
-              >
-                <OrderInfo />
-              </ItemPageUI>
-            )
-          }
-        />
-        <Route
-          path='/ingredients/:id'
-          element={
-            background ? (
-              <Modal
-                title={'Детали ингредиента'}
-                onClose={() => {
-                  dispatch(setSelectItem(null));
-                  navigate('/');
-                }}
-              >
-                <IngredientDetails />
-              </Modal>
-            ) : (
-              <ItemPageUI title='Детали ингредиента'>
-                <IngredientDetails />
-              </ItemPageUI>
-            )
-          }
-        />
-        <Route
-          path='/login'
-          element={
-            <ProtectedRoute onlyUnAuth>
-              <Login />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/register'
-          element={
-            <ProtectedRoute onlyUnAuth>
-              <Register />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/forgot-password'
-          element={
-            <ProtectedRoute onlyUnAuth>
-              <ForgotPassword />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/reset-password'
-          element={
-            <ProtectedRoute onlyUnAuth>
-              <ResetPassword />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/profile'
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/profile/orders'
-          element={
-            <ProtectedRoute>
-              <ProfileOrders />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/profile/orders/:number'
-          element={
-            background ? (
-              <Modal
-                title={orderData?.number === 0 ? '' : `#${orderData?.number}`}
-                onClose={() => {
-                  dispatch(setSelectedOrder('close'));
-                  navigate('/profile/orders');
-                }}
-              >
-                <OrderInfo />
-              </Modal>
-            ) : (
-              <ItemPageUI
-                title={
-                  updatedTitleOrder !== null ? `#${updatedTitleOrder}` : ''
-                }
-              >
-                <OrderInfo />
-              </ItemPageUI>
-            )
-          }
-        />
+    <div className={styles.app}>
+      <AppHeader />
+      {isIngredientsLoading ? (
+        <Preloader />
+      ) : error ? (
+        <div className={clsx(styles.error, 'text text_type_main-medium pt-4')}>
+          {error}
+        </div>
+      ) : (
+        <>
+          <Routes location={background || location}>
+            <Route path='/' element={<ConstructorPage />} />
+            <Route path='/feed' element={<Feed />} />
 
-        <Route path='*' element={<NotFound404 />} />
-      </Route>
-    </Routes>
+            <Route element={<ProtectedRoute onlyUnAuth />}>
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+              <Route path='/forgot-password' element={<ForgotPassword />} />
+              <Route path='/reset-password' element={<ResetPassword />} />
+            </Route>
+
+            <Route element={<ProtectedRoute />}>
+              <Route path='/profile' element={<Profile />} />
+              <Route path='/profile/orders' element={<ProfileOrders />} />
+            </Route>
+
+            <Route path='/feed/:number' element={<OrderInfo />} />
+            <Route path='/ingredients/:id' element={<IngredientDetails />} />
+            <Route
+              path='/profile/orders/:number'
+              element={
+                <ProtectedRoute>
+                  <OrderInfo />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path='*' element={<NotFound404 />} />
+          </Routes>
+
+          {background && (
+            <Routes>
+              <Route
+                path='/feed/:number'
+                element={
+                  <Modal
+                    title={`#${location.pathname.match(/\d+/)?.[0]}`}
+                    onClose={handleModalClose}
+                  >
+                    <OrderInfo />
+                  </Modal>
+                }
+              />
+              <Route
+                path='/ingredients/:id'
+                element={
+                  <Modal title='Детали ингредиента' onClose={handleModalClose}>
+                    <IngredientDetails />
+                  </Modal>
+                }
+              />
+              <Route
+                path='/profile/orders/:number'
+                element={
+                  <ProtectedRoute>
+                    <Modal
+                      title={`#${location.pathname.match(/\d+/)?.[0]}`}
+                      onClose={handleModalClose}
+                    >
+                      <OrderInfo />
+                    </Modal>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

@@ -61,13 +61,16 @@ export const constructorSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(makeOrder.pending, (state) => {
+        state.orderRequest = true;
+      })
       .addCase(makeOrder.fulfilled, (state, action) => {
         state.orderModalData = action.payload.order;
         state.orderRequest = false;
         state.constructorItems = initialState.constructorItems;
       })
-      .addCase(makeOrder.rejected, (_state, action) => {
-        console.log('error', action);
+      .addCase(makeOrder.rejected, (state) => {
+        state.orderRequest = false;
       });
   }
 });

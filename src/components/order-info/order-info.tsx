@@ -3,15 +3,19 @@ import { Preloader, OrderInfoUI } from '@ui';
 import { TIngredient, TOrder } from '@utils-types';
 import { useDispatch, useSelector } from '../../services/store';
 import {
-  loadIngridients,
+  loadIngredients,
   loadOrder,
   selectIngredients,
   selectOrder
-} from '../../slices/rootSlice';
+} from '@slices/rootSlice';
 import { useParams } from 'react-router-dom';
 
+type TIngredientsWithCount = {
+  [key: string]: TIngredient & { count: number };
+};
+
 export const OrderInfo: FC = () => {
-  const orderData: TOrder = useSelector(selectOrder);
+  const orderData: TOrder | null = useSelector(selectOrder);
   const dispatch = useDispatch();
   const params = useParams();
   const data = useSelector(selectIngredients);
@@ -23,34 +27,26 @@ export const OrderInfo: FC = () => {
 
   useEffect(() => {
     if (params.number) {
-      dispatch(loadIngridients());
-      dispatch(loadOrder(Number(params?.number)));
+      dispatch(loadIngredients());
+      dispatch(loadOrder(Number(params.number)));
     }
-  }, []);
+  }, [params.number]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
     const date = new Date(orderData.createdAt);
 
-    type TIngredientsWithCount = {
-      [key: string]: TIngredient & { count: number };
-    };
-
     const ingredientsInfo = orderData.ingredients.reduce(
       (acc: TIngredientsWithCount, item) => {
         if (!acc[item]) {
           const ingredient = ingredients.find((ing) => ing._id === item);
           if (ingredient) {
-            acc[item] = {
-              ...ingredient,
-              count: 1
-            };
+            acc[item] = { ...ingredient, count: 1 };
           }
         } else {
           acc[item].count++;
         }
-
         return acc;
       },
       {}
@@ -61,15 +57,10 @@ export const OrderInfo: FC = () => {
       0
     );
 
-    return {
-      ...orderData,
-      ingredientsInfo,
-      date,
-      total
-    };
+    return { ...orderData, ingredientsInfo, date, total };
   }, [orderData, ingredients]);
 
-  if (!orderInfo || orderData.number === 0) {
+  if (!orderInfo) {
     return <Preloader />;
   }
 

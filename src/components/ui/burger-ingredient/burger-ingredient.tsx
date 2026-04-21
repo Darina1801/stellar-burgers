@@ -10,7 +10,7 @@ import {
 
 import { TBurgerIngredientUIProps } from './type';
 import { useDispatch } from '../../../services/store';
-import { setSelectItem } from '../../../slices/rootSlice';
+import { setSelectItem } from '@slices/rootSlice';
 
 export const BurgerIngredientUI: FC<TBurgerIngredientUIProps> = memo(
   ({ ingredient, count, handleAdd, locationState }) => {

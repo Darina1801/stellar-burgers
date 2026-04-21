@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { TTabMode } from '@utils-types';
 import { BurgerIngredientsUI } from '@ui';
 import { useSelector } from '../../services/store';
-import { selectIngredients } from '../../slices/rootSlice';
+import { selectIngredients } from '@slices/rootSlice';
 
 export const BurgerIngredients: FC = () => {
   const { buns, mains, sauces } = useSelector(selectIngredients);
@@ -29,10 +29,10 @@ export const BurgerIngredients: FC = () => {
   useEffect(() => {
     if (inViewBuns) {
       setCurrentTab('bun');
-    } else if (inViewFilling) {
-      setCurrentTab('main');
     } else if (inViewSauces) {
       setCurrentTab('sauce');
+    } else if (inViewFilling) {
+      setCurrentTab('main');
     }
   }, [inViewBuns, inViewFilling, inViewSauces]);
 

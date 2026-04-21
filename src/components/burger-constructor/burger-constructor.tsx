@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import { useDispatch, useSelector } from '../../services/store';
@@ -8,9 +8,8 @@ import {
   selectOrderModalData,
   selectOrderRequest,
   setOrderModalData,
-  setOrderRequest,
   userDataSelector
-} from '../../slices/rootSlice';
+} from '@slices/rootSlice';
 import { useNavigate } from 'react-router-dom';
 
 export const BurgerConstructor: FC = () => {
@@ -31,7 +30,6 @@ export const BurgerConstructor: FC = () => {
     if (!user) {
       return navigate('/login');
     }
-    dispatch(setOrderRequest(true));
     dispatch(
       makeOrder([
         constructorItems.bun._id,
@@ -42,7 +40,6 @@ export const BurgerConstructor: FC = () => {
   };
 
   const closeOrderModal = () => {
-    dispatch(setOrderRequest(false));
     if (orderModalData) {
       dispatch(setOrderModalData(null));
     }

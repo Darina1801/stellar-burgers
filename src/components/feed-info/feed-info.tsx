@@ -3,13 +3,15 @@ import { FC } from 'react';
 import { TOrder } from '@utils-types';
 import { FeedInfoUI } from '@ui';
 import { useSelector } from '../../services/store';
-import { selectFeedData } from '../../slices/rootSlice';
+import { selectFeedData } from '@slices/rootSlice';
+
+const MAX_ORDERS_DISPLAY = 20;
 
 const getOrders = (orders: TOrder[], status: string): number[] =>
   orders
     .filter((item) => item.status === status)
     .map((item) => item.number)
-    .slice(0, 20);
+    .slice(0, MAX_ORDERS_DISPLAY);
 
 export const FeedInfo: FC = () => {
   const feed = useSelector(selectFeedData);

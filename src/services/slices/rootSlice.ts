@@ -20,6 +20,8 @@ type RootState = ReturnType<typeof rootReducer>;
 
 export const selectFeedData = (state: RootState) => state.feed.feedData;
 export const selectOrders = (state: RootState) => state.feed.orders;
+export const selectIsOrdersLoading = (state: RootState) =>
+  state.feed.isOrdersLoading;
 export const selectOrder = (state: RootState) => state.feed.selectedOrder;
 
 export const selectIngredients = (state: RootState) =>
@@ -27,6 +29,8 @@ export const selectIngredients = (state: RootState) =>
 export const selectItem = (state: RootState) => state.ingredients.selectedItem;
 export const selectIsIngredientsLoading = (state: RootState) =>
   state.ingredients.isIngredientsLoading;
+export const selectIngredientsError = (state: RootState) =>
+  state.ingredients.error;
 
 export const selectConstructorItems = (state: RootState) =>
   state.burgerConstructor.constructorItems;
