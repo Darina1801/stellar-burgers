@@ -9,6 +9,7 @@ import { TOrder } from '@utils-types';
 
 type FeedState = {
   feedData: TFeedsResponse;
+  isFeedLoading: boolean;
   orders: TOrder[];
   isOrdersLoading: boolean;
   selectedOrder: TOrder | null;
@@ -16,6 +17,7 @@ type FeedState = {
 
 const initialState: FeedState = {
   feedData: { success: true, orders: [], total: 0, totalToday: 0 },
+  isFeedLoading: false,
   orders: [],
   isOrdersLoading: false,
   selectedOrder: null
@@ -49,12 +51,15 @@ export const feedSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loadFeedData.pending, (state) => {
+        state.isFeedLoading = true;
         state.feedData = initialState.feedData;
       })
       .addCase(loadFeedData.fulfilled, (state, action) => {
+        state.isFeedLoading = false;
         state.feedData = action.payload;
       })
       .addCase(loadFeedData.rejected, (state) => {
+        state.isFeedLoading = false;
         state.feedData = initialState.feedData;
       });
     builder

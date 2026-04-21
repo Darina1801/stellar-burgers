@@ -19,6 +19,8 @@ const rootReducer = combineReducers({
 type RootState = ReturnType<typeof rootReducer>;
 
 export const selectFeedData = (state: RootState) => state.feed.feedData;
+export const selectIsFeedLoading = (state: RootState) =>
+  state.feed.isFeedLoading;
 export const selectOrders = (state: RootState) => state.feed.orders;
 export const selectIsOrdersLoading = (state: RootState) =>
   state.feed.isOrdersLoading;

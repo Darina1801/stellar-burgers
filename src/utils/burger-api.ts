@@ -235,8 +235,9 @@ export const logoutApi = () =>
     body: JSON.stringify({
       token: localStorage.getItem('refreshToken')
     })
-  }).then((res) => {
-    checkResponse<TServerResponse<{}>>(res);
-    deleteCookie('accessToken');
-    localStorage.removeItem('refreshToken');
-  });
+  })
+    .then((res) => checkResponse<TServerResponse<{}>>(res))
+    .then(() => {
+      deleteCookie('accessToken');
+      localStorage.removeItem('refreshToken');
+    });

@@ -12,7 +12,7 @@ export const IngredientDetails: FC = () => {
 
   useEffect(() => {
     dispatch(loadIngredient(params?.id || ''));
-  }, []);
+  }, [params?.id]);
 
   if (!ingredientData) {
     return <Preloader />;

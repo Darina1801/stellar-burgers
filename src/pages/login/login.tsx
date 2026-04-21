@@ -20,7 +20,6 @@ export const Login: FC = () => {
     try {
       const data = await loginUserApi({ email, password });
       setCookie('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
       dispatch(setUser(data.user));
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
