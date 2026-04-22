@@ -3,7 +3,6 @@ import { Preloader, OrderInfoUI } from '@ui';
 import { TIngredient, TOrder } from '@utils-types';
 import { useDispatch, useSelector } from '../../services/store';
 import {
-  loadIngredients,
   loadOrder,
   selectIngredients,
   selectOrder
@@ -27,7 +26,6 @@ export const OrderInfo: FC = () => {
 
   useEffect(() => {
     if (params.number) {
-      dispatch(loadIngredients());
       dispatch(loadOrder(Number(params.number)));
     }
   }, [params.number]);
