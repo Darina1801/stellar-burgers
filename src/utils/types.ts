@@ -7,6 +7,7 @@ export type TIngredient = {
   carbohydrates: number;
   calories: number;
   price: number;
+  order?: number;
   image: string;
   image_large: string;
   image_mobile: string;

@@ -19,6 +19,11 @@
   background: #8585ad;
 }
 
+.error {
+  text-align: center;
+  color: #e52b1a;
+}
+
 .detailPageWrap {
   margin: 120px auto;
 }
